@@ -10,4 +10,4 @@ In the beginning God created the heavens, the earth. Now the earth was formless 
 
 And we arrive back to the present. Lucifer has been ruling over the heavens for years now and has been doing suprisingly well; and as for God, lets just say some of his more "wilder" fantasies got fufilled. 
 
-God rembers and is looking for you. Help him escape the depths of Hell and you just might go to the good place. 
+God remembers and is looking for revenge. Help him escape the depths of Hell and you just might go to the good place. 
