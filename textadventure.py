@@ -1,10 +1,12 @@
-#py 3
-#text adventure - type 1 - uses objects and is long.
+# py 3
+# text adventure - type 1 - uses objects and is long.
 
-import os
+import os # relies on os for 'cls' - possible incompatibility with other operating systems besides Windows.
+
 
 class Location:
    def __init__(self, locationName, directions, description, people = [], items = [], enemies = []):
+       # The constructor that makes the object arguments for LOCATION.
        self.locationName = locationName
        self.directions = directions
        self.description = description
@@ -12,83 +14,101 @@ class Location:
        self.items = items
        self.enemies = enemies
    def ShowInfo(self):
-       title = "Current Location: " + self.locationName
+       # function that shows current room info
+       # triggered every time you move into a different room.
+       title = "Current Location: " + self.locationName # prints location, seperated from other sections by a line of '='
        print(title)
        print("="*len(title))
-       print("Possible Paths: ")
-       print("-"*len(title))
+       print("Possible Paths: ") # prints possible paths. 
+       print("-"*len(title)) # title seperated from the list of paths by a line of '-', and from the other sections by a line of '='
        for entry in self.directions:
-           print(entry + ": " + self.directions[entry])
+           print(entry + ": " + self.directions[entry]) # prints every possible path.
        print("="*len(title))
 
-       if len(self.people) != 0:
-          print("People Present: ")
+       if len(self.people) != 0: # prints people present, if there are any. 
+          print("People Present: ") # title separated from list by line of '-', and from other sections by line of '='.
           print("-"*len(title))
           for person in self.people:
              print(person.name)
           print("="*len(title))
 
-       if len(self.items) != 0:
-          print("Objects Present: ")
+       if len(self.items) != 0: # prints items present, if there are any. 
+          print("Objects Present: ") # title separated from list by line of '-', and from other sections by a line of '='.
           print("-"*len(title))
           for item in self.items:
              print(item.name)
           print("="*len(title))
-   def AddItem(self, itemAdding, amountThrowing):
+
+   def AddItem(self, itemAdding, amountThrowing): # CONFIRM, CREATOR - creates an item.
       for i in range(amountThrowing):
          self.items.append(itemAdding)
       os.system('cls')
       self.ShowInfo()
 
+
 class Creature:
-   class LevelOneStats:
-      def __init__(self, attackPoints, healthPoints, defencePoints):
-         self.attackPoints = attackPoints
-         self.healthPoints = healthPoints
-         self.defencePoints = defencePoints
+    class LevelOneStats:
+        def __init__(self, attackPoints, healthPoints, defencePoints):
+            # sets constructor for level 1 stats
+            self.attackPoints = attackPoints
+            self.healthPoints = healthPoints
+            self.defencePoints = defencePoints
+
    class CurrentMaximumStats:
       def __init__(self, attackPoints, healthPoints, defencePoints):
+        # sets constructor for maximum stats
          self.attackPoints = attackPoints
          self.healthPoints = healthPoints
          self.defencePoints = defencePoints
+
    class CurrentStats:
       def __init__(self, attackPoints, healthPoints, defencePoints):
+        # sets constructor for current stats
          self.attackPoints = attackPoints
          self.healthPoints = healthPoints
          self.defencePoints = defencePoints
+
    def __init__(self, name, level, levelOneStats, description):
-      self.name = name
-      self.level = level
-      self.levelOneStats = Creature.LevelOneStats(1, 1, 1)
-      self.description = description
-      self.currentMaximumStats = self.SetCurrentMaximumStats(level)
-      self.currentStats = self.SetCurrentStats(
-         self.currentMaximumStats.attackPoints,
-         self.currentMaximumStats.healthPoints,
-         self.currentMaximumStats.defencePoints
-         )      
+        # sets constructor for creature info
+        self.name = name
+        self.level = level
+        self.levelOneStats = Creature.LevelOneStats(1, 1, 1)
+        self.description = description
+        self.currentMaximumStats = self.SetCurrentMaximumStats(level)
+        self.currentStats = self.SetCurrentStats( # sets current stats to the current maximum stats
+            self.currentMaximumStats.attackPoints,
+            self.currentMaximumStats.healthPoints,
+            self.currentMaximumStats.defencePoints
+        )      
+
    def SetCurrentMaximumStats(self, level):
-      attackPoints = self.levelOneStats.attackPoints * pow(1.15, level)
-      healthPoints = self.levelOneStats.healthPoints * pow(1.15, level)
-      defencePoints = self.levelOneStats.defencePoints * pow(1.15, level)
-      return Creature.CurrentMaximumStats(attackPoints, healthPoints, defencePoints)  
+       # function that sets max stats depending on the level
+        attackPoints = self.levelOneStats.attackPoints * pow(1.15, level) # multiplies level 1 stats by 1.15 ^ level
+        healthPoints = self.levelOneStats.healthPoints * pow(1.15, level) # pow could be simplified to `1.15 ** level`
+        defencePoints = self.levelOneStats.defencePoints * pow(1.15, level)
+        return Creature.CurrentMaximumStats(attackPoints, healthPoints, defencePoints) # returns an object with those attributes
+
    def SetCurrentStats(self, newAttackPoints, newHealthPoints, newDefencePoints):
-      return Creature.CurrentStats(newAttackPoints, newHealthPoints, newDefencePoints)   
-   def HealHP(self, amount):
+      return Creature.CurrentStats(newAttackPoints, newHealthPoints, newDefencePoints) # sets current stats to value
+
+   def HealHP(self, amount): # heals creature (with validation for maximum) 
       if (self.currentHealthPoints + amount > self.currentHealthPoints):
          self.currentHealthPoints = self.currentHealthPoints
       else:
          self.currentHealthPoints += amount
          
+
 class Player(Creature):
    def __init__(self):
       super()
       self.inventory = {}
       self.level = 1
       self.levelOneStats = Creature.LevelOneStats(1, 1, 1)   
+
    def Attack(self, weapon, enemy):
       damageTaken = weapon.damage + Creature.CurrentStats.attackPoints
       print("Player attacks " + enemy.name + ". Enemy takes " + str(damageTaken))
+
    def AddItemInventory(self, itemAdding):
       foundInInventory = False
       for item in self.inventory.keys():
@@ -98,6 +118,7 @@ class Player(Creature):
             break
       if not foundInInventory:
          self.inventory[itemAdding] = 1
+
    def RemoveItemInventory(self, itemRemoving, amountRemoving):
       foundItem = None
       for item in self.inventory.keys():
@@ -107,7 +128,8 @@ class Player(Creature):
       if foundItem != None:
          self.inventory[foundItem] -= amountRemoving
          if self.inventory[foundItem] == 0:
-            self.inventory.pop(foundItem)       
+            self.inventory.pop(foundItem)   
+
    def DisplayInventory(self):
       os.system('cls')
       currentLocation.ShowInfo()
@@ -118,35 +140,42 @@ class Player(Creature):
          print(item.name + ": x" + str(self.inventory[item]))
       print("="*length)
 
+
 class Person(Creature):
    def __init__(self, name, level, levelOneStats, description, dialogue):
       Creature.__init__(self, name, level, levelOneStats, description)
       self.dialogue = dialogue
+
 
 class Item:
    def __init__(self, name, description):
       self.name = name
       self.description = description
 
+
 class Potion(Item):
    class RandomHealAmount:
       def __init__(self, minimum, maximum):
          self.minimum = minimum
          self.maximum = maximum
+
    def __init__(self, name, description, healAmount, randomHealAmount = None):
       Item.__init__(self, name, description)
       self.healAmount = healAmount
       self.randomHealAmount = randomHealAmount
+
 
 class Weapon(Item):
    def __init__(self, name, description, damage):
       Item.__init__(self, name, description)
       self.damage = damage
 
+
 class Armour(Item):
    def __init__(self, name, description, defence):
       Item.__init__(self, name, description)
       self.defence = defence
+
       
 def MoveLocation(command):
     global currentLocation
@@ -176,6 +205,7 @@ def MoveLocation(command):
     else:
         return print("Invalid command: Location doesn't exist!")
 
+
 def RefreshScreen(command):
    if len(command) == 1:
       os.system('cls')
@@ -183,6 +213,7 @@ def RefreshScreen(command):
    else:
       return print("Invalid command: Can only just do 'refresh'!")
    
+
 def TalkToPerson(command):
    if len(command) == 1:
       return print("Invalid command: Need to specify who to talk to!")
@@ -197,6 +228,7 @@ def TalkToPerson(command):
             break
    else:
       return print("Invalid command: Person does not exist at this location!")
+
 
 def GetItem(command):
    if len(command) == 1:
@@ -217,6 +249,7 @@ def GetItem(command):
             break
    else:
       return print("Invalid command: The item does not exist in this location!")
+
 
 def ThrowItem(command):
    if len(command) == 1:
@@ -248,13 +281,14 @@ def ThrowItem(command):
             break
    else:
       return print("Invalid command: Item does not exist in inventory!")
-            
+          
 
 def ShowInventory(command):
    if len(command) == 1:
       player.DisplayInventory()
    else:
       return print("Invalid command: Can only do 'inventory'!")
+
 
 def UseItem(command):
    if len(command) == 1:
@@ -283,6 +317,7 @@ def UseItem(command):
          break
    else:
       return print("Invalid command: Item does not exist in inventory")
+
 
 def ShowDescription(command):
    if len(command) == 1:
@@ -320,6 +355,7 @@ def ShowDescription(command):
    else:
       return print("Invalid command:\n-Item does not exist in inventory OR\n-Person does not exist in location OR\n-Player not present in that location!")
 
+
 def ShowHelpMenu(command):
    if len(command) == 1:
       os.system('cls')
@@ -339,6 +375,7 @@ def ShowHelpMenu(command):
    else:
       return print("Invalid command: Can only just do 'help'!")
    
+
 basement = Location(
    "basement",
    {"north": "house", "west": "garden", "east": "location3", "south" : "location4"},
