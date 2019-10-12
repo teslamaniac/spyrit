@@ -1,6 +1,8 @@
 #NOTE: THIS SCRIPT IS WRITTEN IN PYTHON 2.7. AS SUCH, IT WILL NOT WORK IN PYTHON 3 UNTIL 
 #SOMEONE DECIDES TO REPLACE ALL THE 'raw_input's WITH 'input's AND PUT BRACKETS AROUND THE 'print' ARGUMENTS.
 
+#UPDATE: MAY HAVE BEEN UPDATED TO 3.7
+
 
 '''TO DO LIST
 1. add more items
@@ -9,7 +11,7 @@
 4. make items usable and make interactive objects in a room
 '''
 def showInstructions():
-  print '''
+  print('''
 RPG Game
 ========
 Commands:
@@ -18,16 +20,16 @@ Commands:
   use [item] [WIP]
   quit
   help
-'''
+''')
 
 def showStatus():  
-  print '---------------------------'
-  print 'You are in ' + currentRoom
-  print 'Inventory: ' + str(inventory)
+  print('---------------------------')
+  print('You are in ' + currentRoom)
+  print('Inventory: ' + str(inventory))
   if "item" in rooms[currentRoom]:
-    print 'You see ' + rooms[currentRoom]['item']
-  print rooms[currentRoom]['roomdesc']
-  print '---------------------------'
+    print('You see ' + rooms[currentRoom]['item'])
+  print(rooms[currentRoom]['roomdesc'])
+  print('---------------------------')
     
 
 inventory = []
@@ -112,17 +114,18 @@ showInstructions()
 
 def kitchenEncounter():
   showStatus()
-  print "You see the bridgekeeper..."
-  user_input =  raw_input("'What is the average windspeed of unladen swallow?'")
+  print("You see the bridgekeeper...")
+  user_input =  input("'What is the average windspeed of unladen swallow?'")
   if user_input.lower() == "african or european?":
-    print "'I... don't know...'"
-    print "The room grows dim as a force of black energy "
-    print "The Bridgekeeper dies."
+    print("'I... don't know...'")
+    print("The room grows dim as a force of black energy fills the room.")
+    print("A shadowed claw extended from the window pane, and pulled him out through it.")
+    print("The Bridgekeeper dies.")
     return True
   elif '11' in user_input or '24' in user_input or '40' in user_input:
-    print "'You may pass...'"
-    print "As you move through the kitchen, you push the bridgekeeper out of the open window."
-    print "The Bridgekeeper dies."
+    print("'You may pass...'")
+    print("As you move through the kitchen, you push the bridgekeeper out of the open window.")
+    print("The Bridgekeeper dies.")
     rooms[currentRoom]['roomdesc'] = '''
 You look around you.
 The room is eerily empty
@@ -136,7 +139,7 @@ while True:
   showStatus()
   move = ''
   while move == '':
-    move = raw_input(">")
+    move = input(">")
   move = move.lower().split()
 
   if move[0] == 'go':
@@ -144,27 +147,27 @@ while True:
       currentRoom = rooms[currentRoom][move[1]]
       continue
     else:
-      print "You can't go that way!"
+      print("You can't go that way!")
       continue
   if move[0] == 'get':
     if 'item' in rooms[currentRoom] and move[1] in rooms[currentRoom]['item']:
       inventory += [move[1]]
-      print move[1] + " got!"
+      print(move[1] + " got!")
       del rooms[currentRoom]['item']
       continue
     elif 'back-item' in rooms[currentRoom] and move[1] in rooms[currentRoom]['back-item']:
-      print "You can't get environmental items!"
+      print("You can't get environmental items!")
       continue
     else:
-      print "Cannae get " + move[1] + "!"
+      print("Cannae get " + move[1] + "!")
       continue
   if 'item' in rooms[currentRoom] and 'the bridgekeeper' in rooms[currentRoom]['item']:
     if kitchenEncounter() == True:
       del rooms[currentRoom]['item']
       continue
     else:
-      "You died..."
-      thing = raw_input("Do you want to play again? [Y/N]: ")
+      print("You died...")
+      thing = input("Do you want to play again? [Y/N]: ")
       if thing.upper() == "N":
         break
       else:
@@ -172,12 +175,12 @@ while True:
         inventory = []
   if move[0] == "use":
     if 'back-item' in rooms[currentRoom] and move[1] in rooms[currentRoom]['back-item']:
-      print rooms[currentRoom]['back-item-event']
+      print(rooms[currentRoom]['back-item-event'])
     else:
-      print "Cannae use " + move[1] + "!"
+      print("Cannae use " + move[1] + "!")
   if move[0] == "quit":
     break
   if move[0] == "help":
     showInstructions()
   else:
-    print "That command was invalid. Please try again."
+    print("That command was invalid. Please try again.")
