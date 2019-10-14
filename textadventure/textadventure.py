@@ -1,4 +1,4 @@
-# py 3
+# py 3.7
 # text adventure - type 1 - uses objects and is long.
 
 import os # relies on os for 'cls' - possible incompatibility with other operating systems besides Windows.
