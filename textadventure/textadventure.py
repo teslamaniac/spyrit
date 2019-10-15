@@ -1,9 +1,6 @@
 # py 3.7
 # text adventure - type 1 - uses objects and is long.
-
-import os # relies on os for 'cls' - possible incompatibility with other operating systems besides Windows.
-
-
+# GOTTA COMMENT A LOTTA STUFF!!!
 class Location:
     def __init__(self, locationName, directions, description, people = [], items = [], enemies = []):
         # The constructor that makes the object arguments for LOCATION.
@@ -16,6 +13,8 @@ class Location:
     def ShowInfo(self):
         # function that shows current room info
         # triggered every time you move into a different room.
+        import os # relies on os for 'cls' - possible incompatibility with other operating systems besides Windows.
+        os.system('cls')
         title = "Current Location: " + self.locationName # prints location, seperated from other sections by a line of '='
         print(title)
         print("="*len(title))
@@ -32,6 +31,13 @@ class Location:
                 print(person.name)
             print("="*len(title))
 
+       if len(self.enemies) != 0: # prints enemies present, if there are any.
+          print("Enemies Present: ") # title separated from list by line of '-', and from other sections by a line of '='.
+          print("-"*len(title))
+          for enemy in self.enemies:
+             print(enemy.name)
+          print("="*len(title))
+          
         if len(self.items) != 0: # prints items present, if there are any. 
             print("Objects Present: ") # title separated from list by line of '-', and from other sections by a line of '='.
             print("-"*len(title))
@@ -42,7 +48,6 @@ class Location:
     def AddItem(self, itemAdding, amountThrowing): # CONFIRM, CREATOR - creates an item.
         for i in range(amountThrowing):
             self.items.append(itemAdding)
-        os.system('cls')
         self.ShowInfo()
 
 
@@ -72,7 +77,7 @@ class Creature:
         # sets constructor for creature info
         self.name = name
         self.level = level
-        self.levelOneStats = Creature.LevelOneStats(1, 1, 1)
+        self.levelOneStats = levelOneStats
         self.description = description
         self.currentMaximumStats = self.SetCurrentMaximumStats(level)
         self.currentStats = self.SetCurrentStats( # sets current stats to the current maximum stats
@@ -83,13 +88,36 @@ class Creature:
 
     def SetCurrentMaximumStats(self, level):
         # function that sets max stats depending on the level
-        attackPoints = self.levelOneStats.attackPoints * pow(1.15, level) # multiplies level 1 stats by 1.15 ^ level
-        healthPoints = self.levelOneStats.healthPoints * pow(1.15, level) # pow could be simplified to `1.15 ** level`
-        defencePoints = self.levelOneStats.defencePoints * pow(1.15, level)
+        attackPoints = self.levelOneStats.attackPoints + level - 1 # sets max stats to level number
+        healthPoints = self.levelOneStats.healthPoints + level - 1 
+        defencePoints = self.levelOneStats.defencePoints + level - 1
         return Creature.CurrentMaximumStats(attackPoints, healthPoints, defencePoints) # returns an object with those attributes
 
     def SetCurrentStats(self, newAttackPoints, newHealthPoints, newDefencePoints):
         return Creature.CurrentStats(newAttackPoints, newHealthPoints, newDefencePoints) # sets current stats to value
+
+    def TakeDamage(self, damage):
+      def DisplayDamageCalculation(): # displays damage calculation
+         print("Player attacks " + self.name + ". Enemy takes " + str(damage))
+         print(self.name + " now on: " + str(self.currentStats.healthPoints) + "/" + str(self.currentMaximumStats.healthPoints))
+      self.currentStats.healthPoints -= damage # calculates damage
+      if (self.currentStats.healthPoints <= 0): # tells whether you die or not
+         self.currentStats.healthPoints = 0
+         self.Die()
+         DisplayDamageCalculation()
+         print (self.name + " died!") # this rubs the fact that you died in your face over and over again 
+      else:
+         DisplayDamageCalculation()  # pisses everyone off if you don't die.
+         while len(currentLocation.people) > 0:
+            currentLocation.people[0].Anger()
+         currentLocation.ShowInfo()
+
+    def Die(self): # kills NPC
+      if type(self) is Person:
+         currentLocation.people.remove(self)
+         while len(currentLocation.people) > 0:
+            currentLocation.people[0].Anger()
+      currentLocation.ShowInfo()
 
     def HealHP(self, amount): # heals creature (with validation for maximum) 
         if (self.currentHealthPoints + amount > self.currentHealthPoints):
@@ -99,71 +127,68 @@ class Creature:
          
 
 class Player(Creature):
-    def __init__(self): # constructs player (super() means that player also uses the creature constructors)
-        super()
-        self.inventory = {}
-        self.level = 1
-        self.levelOneStats = Creature.LevelOneStats(1, 1, 1)   
+   def __init__(self, level, levelOneStats, description = None, name = None):
+      Creature.__init__(self, name, level, levelOneStats, description) #takes constructor from creature
+      self.inventory = {}
 
-    def Attack(self, weapon, enemy): # player attacks a creature. random damage could be used for more variety.
-        damageTaken = weapon.damage + Creature.CurrentStats.attackPoints # damage = weapon damage + creature attack points
-        print("Player attacks " + enemy.name + ". Enemy takes " + str(damageTaken))
+   def Attack(self, weapon, enemy):
+      damageTaken = weapon.damage + self.currentStats.attackPoints # damages enemy for weapon's points
+      enemy.TakeDamage(damageTaken)
 
-    def AddItemInventory(self, itemAdding): # adds an item to player inventory
-        foundInInventory = False 
-        for item in self.inventory.keys(): # increases quantity of item by 1.
-            if item.name == itemAdding.name:
-                self.inventory[item] += 1
-                foundInInventory = True
-                break
-        if not foundInInventory:
-            self.inventory[itemAdding] = 1
+   def AddItemInventory(self, itemAdding):
+      foundInInventory = False 
+      for item in self.inventory.keys(): # increments item in inventory by 1 if found, and creates one if not found.
+         if item.name == itemAdding.name:
+            self.inventory[item] += 1
+            foundInInventory = True
+            break
+      if not foundInInventory:
+         self.inventory[itemAdding] = 1
 
-    def RemoveItemInventory(self, itemRemoving, amountRemoving): # removes an item from player inventory
-        foundItem = None
-        for item in self.inventory.keys(): # searches for item to be removed
-            if item.name == itemRemoving.name:
-                foundItem = item
-                break         
-        if foundItem != None:
-            self.inventory[foundItem] -= amountRemoving # removes item by that amount.
-            if self.inventory[foundItem] == 0: # not sure what this does.
-                self.inventory.pop(foundItem)
-           
+   def RemoveItemInventory(self, itemRemoving, amountRemoving):
+      foundItem = None
+      for item in self.inventory.keys(): # searches for item, and then removes all instances of it if found
+         if item.name == itemRemoving.name:
+            foundItem = item
+            break         
+      if foundItem != None:
+         self.inventory[foundItem] -= amountRemoving
+         if self.inventory[foundItem] == 0:
+            self.inventory.pop(foundItem)  
 
-    def DisplayInventory(self):
-        os.system('cls')
-        currentLocation.ShowInfo()
-        length = len("Current Location: " + currentLocation.locationName)
-        print("Inventory:")
-        print("-"*length)
-        for item in self.inventory:
-            print(item.name + ": x" + str(self.inventory[item]))
-        print("="*length)
+   def DisplayInventory(self):
+      currentLocation.ShowInfo() #prints inventory contents
+      length = len("Current Location: " + currentLocation.locationName)
+      print("Inventory:")
+      print("-"*length)
+      for item in self.inventory:
+         print(item.name + ": x" + str(self.inventory[item]))
+      print("="*length)
 
 
 class Person(Creature):
-    def __init__(self, name, level, levelOneStats, description, dialogue):
-        Creature.__init__(self, name, level, levelOneStats, description)
-        self.dialogue = dialogue
-
+   def __init__(self, name, level, levelOneStats, description, dialogue):
+      Creature.__init__(self, name, level, levelOneStats, description)
+      self.dialogue = dialogue
+   def Anger(self): # makes NPC into enemy
+      currentLocation.enemies.append(self)
+      currentLocation.people.remove(self)
 
 class Item:
-    def __init__(self, name, description):
+    def __init__(self, name, description): # sets constructor for item
         self.name = name
         self.description = description
 
 
 class Potion(Item):
-    class RandomHealAmount:
-        def __init__(self, minimum, maximum):
-            self.minimum = minimum
-            self.maximum = maximum
-
-    def __init__(self, name, description, healAmount, randomHealAmount = None):
-        Item.__init__(self, name, description)
-        self.healAmount = healAmount
-        self.randomHealAmount = randomHealAmount
+   class RandomHealAmount:
+      def __init__(self, minimum, maximum): # WIP. heals a random amount between min & max.
+         self.minimum = minimum
+         self.maximum = maximum
+   def __init__(self, name, description, healAmount, randomHealAmount = None):
+      Item.__init__(self, name, description)
+      self.healAmount = healAmount # constructor for potion
+      self.randomHealAmount = randomHealAmount
 
 
 class Weapon(Item):
@@ -178,7 +203,7 @@ class Armour(Item):
         self.defence = defence
 
       
-def MoveLocation(command):
+def MoveLocation(command): # COMMENT THIS BIT 
     global currentLocation
     if len(command) == 1:
         return print("Invalid Command: Need to specify where to move to!")
@@ -208,14 +233,13 @@ def MoveLocation(command):
 
 
 def RefreshScreen(command):
-    if len(command) == 1:
-        os.system('cls')
-        currentLocation.ShowInfo()
-    else:
-        return print("Invalid command: Can only just do 'refresh'!")
+   if len(command) == 1: # refreshes screen
+      currentLocation.ShowInfo()
+   else:
+      return print("Invalid command: Can only just do 'refresh'!")
    
 
-def TalkToPerson(command):
+def TalkToPerson(command): # talks to person. COMMENT THIS LATER
     if len(command) == 1:
         return print("Invalid command: Need to specify who to talk to!")
     if len(command) > 2:
@@ -232,24 +256,23 @@ def TalkToPerson(command):
 
 
 def GetItem(command):
-    if len(command) == 1:
-        return print("Invalid command: Need to specify what item to get!")
-    if len(command) > 2:
-        return print("Invalid command: Can only enter two words!")
-    if command[1] in [p.name for p in currentLocation.people]:
-        return print("Invalid command: No slavery allowed!")
+   if len(command) == 1:
+      return print("Invalid command: Need to specify what item to get!")
+   if len(command) > 2:
+      return print("Invalid command: Can only enter two words!")
+   if command[1] in [p.name for p in currentLocation.people]:
+      return print("Invalid command: No slavery allowed!")
 
-    possibleItems = [item.name for item in currentLocation.items]
-    if command[1] in possibleItems:
-        for item in currentLocation.items:
-            if command[1] == item.name:
-                os.system('cls')
-                currentLocation.items.remove(item)
-                player.AddItemInventory(item)
-                currentLocation.ShowInfo()
-                break
-    else:
-        return print("Invalid command: The item does not exist in this location!")
+   possibleItems = [item.name for item in currentLocation.items]
+   if command[1] in possibleItems:
+      for item in currentLocation.items:
+         if command[1] == item.name:
+            currentLocation.items.remove(item)
+            player.AddItemInventory(item)
+            currentLocation.ShowInfo()
+            break
+   else:
+      return print("Invalid command: The item does not exist in this location!")
 
 
 def ThrowItem(command):
@@ -292,89 +315,92 @@ def ShowInventory(command):
 
 
 def UseItem(command):
-    if len(command) == 1:
-        return print("Invalid command: Must specify what item to use!")
-    possibleItems = [i.name for i in player.inventory]
-    possiblePeople = [p.name for p in currentLocation.people]
-    if command[1] in possibleItems or command[1] in possiblePeople:
-        for item in player.inventory:
-            if command[1] == item.name:
-                if type(item) is Potion:
-                    if len(command) > 2:
-                        return print("Invalid command: For potion items just type in the command: 'use <potion name>'!")
-                else:
-                    if (player.currentHealthPoints == player.levelOneStats.healthPoints):
-                        return print("Invalid command: Player HP already maxed!")
-                    else:
-                        return print("Healed " + str(item.healAmount))
+   if len(command) == 1:
+      return print("Invalid command: Must specify what item to use!")
+   possibleItems = [i.name for i in player.inventory]
+   possiblePeople = [p.name for p in currentLocation.people]
+   if command[1] in possibleItems or command[1] in possiblePeople:
+      for item in player.inventory:
+         if command[1] == item.name:
+            if type(item) is Potion:
+               if len(command) > 2:
+                  return print("Invalid command: For potion items just type in the command: 'use <potion name>'!")
+               else:
+                  if (player.currentHealthPoints == player.levelOneStats.healthPoints):
+                     return print("Invalid command: Player HP already maxed!")
+                  else:
+                     return print("Healed " + str(item.healAmount))
             if type(item) is Weapon:
-                if len(command) == 2:
-                    return print("Invalid command: Must specify who to use weapon on!")
-                elif len(command) > 3:
-                    return print("Invalid command: Must enter 3 words!")
-                for person in currentLocation.people:
-                    if command[2] == person.name:
-                        player.Attack(item, person)                
-            break
-    else:
-        return print("Invalid command: Item does not exist in inventory")
+               if len(command) == 2:
+                  return print("Invalid command: Must specify who to use weapon on!")
+               elif len(command) > 3:
+                  return print("Invalid command: Must enter 3 words!")
+               if command[2] in possiblePeople:
+                  for person in currentLocation.people:
+                     if command[2] == person.name:
+                        player.Attack(item, person)
+                        break
+               else:
+                  return print("Invalid command: Enemy does not exist")
+         break
+   else:
+      return print("Invalid command: Item does not exist in inventory")
 
 
 def ShowDescription(command):
-    if len(command) == 1:
-        return print("Invalid command: Need to specify what to show info for!")
-    if len(command) > 2:
-        return print("Invalid command: Can only enter two words!")
-    possibleItems = [i.name for i in player.inventory]
-    possiblePeople = [p.name for p in currentLocation.people]
+   if len(command) == 1:
+      return print("Invalid command: Need to specify what to show info for!")
+   if len(command) > 2:
+      return print("Invalid command: Can only enter two words!")
+   possibleItems = [i.name for i in player.inventory]
+   possiblePeople = [p.name for p in currentLocation.people]
       
-    if command[1] in possibleItems:
-        for item in player.inventory:
-            if command[1] == item.name:
-                if type(item) is Potion:
-                    print("*Info* " + item.name + ":")
-                    print("Type: Potion")
-                    print("HP Heal: " + str(item.healAmount))
-                    print("Desc: '" + str(item.description) + "'")
-                elif type(item) is Weapon:
-                    print("*Info* " + item.name + ":")
-                    print("Type: Weapon")
-                    print("Damage: " + str(item.damage))
-                    print("Desc: '" + str(item.description) + "'")
-                break
-    elif command[1] in possiblePeople:
-        for person in currentLocation.people:
-            if command[1] == person.name:
-                print("*Info* " + person.name + ":")
-                print("Desc: '" + person.description + "'")
-                print("HP: " + str(person.currentStats.healthPoints))
-                print("Atk: " + str(person.currentStats.attackPoints))
-                print("Def: " + str(person.currentStats.defencePoints))
-                break
-    elif command[1] == currentLocation.locationName:
-        print("*Info* " + currentLocation.locationName + ": '" + currentLocation.description + "'")            
-    else:
-        return print("Invalid command:\n-Item does not exist in inventory OR\n-Person does not exist in location OR\n-Player not present in that location!")
+   if command[1] in possibleItems:
+      for item in player.inventory:
+         if command[1] == item.name:
+            if type(item) is Potion:
+               print("*Info* " + item.name + ":")
+               print("Type: Potion")
+               print("HP Heal: " + str(item.healAmount))
+               print("Desc: '" + str(item.description) + "'")
+            elif type(item) is Weapon:
+               print("*Info* " + item.name + ":")
+               print("Type: Weapon")
+               print("Damage: " + str(item.damage))
+               print("Desc: '" + str(item.description) + "'")
+            break
+   elif command[1] in possiblePeople:
+      for person in currentLocation.people:
+         if command[1] == person.name:
+            print("*Info* " + person.name + ":")
+            print("Desc: '" + person.description + "'")
+            print("HP: " + str(person.currentStats.healthPoints))
+            print("Atk: " + str(person.currentStats.attackPoints))
+            print("Def: " + str(person.currentStats.defencePoints))
+            break
+   elif command[1] == currentLocation.locationName:
+      print("*Info* " + currentLocation.locationName + ": '" + currentLocation.description + "'")            
+   else:
+      return print("Invalid command:\n-Item does not exist in inventory OR\n-Person does not exist in location OR\n-Player not present in that location!")
 
 
 def ShowHelpMenu(command):
-    if len(command) == 1:
-        os.system('cls')
-        currentLocation.ShowInfo()
-        print("Help Menu:")
-        length = len("Current Location: " + currentLocation.locationName)
-        print("="*length)
-        print("move| move <location name> OR move + <direction>| Moves player to new location")
-        print("refresh| refresh| Closes inventory & removes a bunch of useless text")
-        print("talk| talk <person name>| Talks to a person")
-        print("get| get <item name>| Pick up an item from location")
-        print("inventory| inventory| Shows player's inventory")
-        print("info| info <item name> OR info <person name>| gives more info")
-        print("throw| throw <item name> OR throw <item name > <quantity>| throws an item")
-        print("help| help| already in help menu, if don't know how to use help to get help, not my problem")
-        print("="*length)
-    else:
-        return print("Invalid command: Can only just do 'help'!")
+   if len(command) == 1:
+      currentLocation.ShowInfo()
+      print("Help Menu:")
+      length = len("Current Location: " + currentLocation.locationName)
+      print("="*length)
+      print("move| move <location name> OR move + <direction>| Moves player to new location")
+      print("refresh| refresh| Closes inventory & removes a bunch of useless text")
+      print("talk| talk <person name>| Talks to a person")
+      print("get| get <item name>| Pick up an item from location")
+      print("inventory| inventory| Shows player's inventory")
+      print("info| info <item name> OR info <person name>| gives more info")
+      print("throw| throw <item name> OR throw <item name > <quantity>| throws an item")
+      print("help| help| already in help menu, if don't know how to use help to get help, not my problem")
+      print("="*length)
+   else:
+      return print("Invalid command: Can only just do 'help'!")
    
 
 basement = Location(
@@ -385,7 +411,7 @@ basement = Location(
       Person(
          "nic",
          1,
-         Creature.LevelOneStats(1, 1, 1),
+         Creature.LevelOneStats(1, 6, 1),
          "He is also called nic the dick",
          "Hello there!"),
       Person(
@@ -393,7 +419,19 @@ basement = Location(
          1,
          Creature.LevelOneStats(1, 1, 1),
          "Stay away from him he is a pedo",
-         "Come here little boy! come to papa!")
+         "Come here little boy! come to papa!"),
+      Person(
+         "joseph",
+         1,
+         Creature.LevelOneStats(1, 1, 1),
+         "Stay away from him he is a jew",
+         "Gimme your money!"),
+      Person(
+         "jiatee",
+         1,
+         Creature.LevelOneStats(1, 1, 1),
+         "Stay away from him he only hangs out with the cool kids",
+         "Go away! You're too uncool for me!")
       ],
    [
       Potion("marijuana", "feels good man!", 50), Potion("marijuana", "feels good man!", 50), Weapon("fly_swatter", "$2 from Woolworths", 3)
@@ -415,7 +453,7 @@ garden = Location(
 locationList = [basement, house, garden]
 commandList = {"move", "refresh", "talk", "get", "inventory", "info", "help", "throw", "use"}
 
-player = Player()
+player = Player(1, Creature.LevelOneStats(1, 1, 1))
 
 currentLocation = basement
 currentLocation.ShowInfo()
@@ -425,22 +463,22 @@ while gameOver == False:
     commandEntered = input("Enter a command: ").strip().lower().split()
     
     if commandEntered[0] not in commandList:
-        print("invalid command: command doesn't exist!")
+       print("invalid command: command doesn't exist!")
     elif commandEntered[0] == "move":    
-        MoveLocation(commandEntered)
+       MoveLocation(commandEntered)
     elif commandEntered[0] == "refresh":      
-        RefreshScreen(commandEntered)
+       RefreshScreen(commandEntered)
     elif commandEntered[0] == "talk":
-        TalkToPerson(commandEntered)
+       TalkToPerson(commandEntered)
     elif commandEntered[0] == "get":
-        GetItem(commandEntered)
+       GetItem(commandEntered)
     elif commandEntered[0] == "inventory":
-        ShowInventory(commandEntered)
+       ShowInventory(commandEntered)
     elif commandEntered[0] == "info":
-        ShowDescription(commandEntered)
+       ShowDescription(commandEntered)
     elif commandEntered[0] == "help":
-        ShowHelpMenu(commandEntered)
+       ShowHelpMenu(commandEntered)
     elif commandEntered[0] == "throw":
-        ThrowItem(commandEntered)
+       ThrowItem(commandEntered)
     elif commandEntered[0] == "use":
-        UseItem(commandEntered)
+       UseItem(commandEntered)
