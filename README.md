@@ -16,25 +16,3 @@ God remembers and is looking for revenge. Help him escape the depths of Hell and
 
 # What's comming up?
 We're having a little trouble loading this page right now. Check back soon!
-        ,                     .-' ,c'.
-         __rK                    _)a  7  ;
-        /  ~,)                  (_,      (
-      _;   /a(                   |_.    :'\
-      L/\.'__/                   \       ' )nnnK-.
-      S  / (_                  .- L,-'   .dHHHb   |
-      S( '\_\\                / dHb'----'dHHHHb    \
-      S \  ,  )      _,-._   / dHHHb"x.dHHHHHHb     \
-      S |'. '.______/_U/_ '.-z/dHHHp   'dHHHHHb\     |
-     [H |  '..___.--'._C__  ) |         dHHHHHHb\ _   \
-     /| |_  | \     L/'--._/_ ;                  k '  /
-     |//- '-. ---.__         '|                 /     |
-      (       '-.   '.        |               _'-.  _/
-  .."' `.,  _ ,  :  | \      _\             ,/ ,  '/
-."       ':   .     : |   .-' '',          : |/(/\]/
-          \  /:  '  | :  /_      '...... .'/      |
-           |     |  : / .' '--.__,     __.'\      /
-           |   : ;  |/ |         '----'L,  |     /
-            \  : .   \  '-.________ /   ]  |____/
-    snd     L_____'..'           _.7' _/  <,    >
-                                <___.'     /    \
-                                           \____/
