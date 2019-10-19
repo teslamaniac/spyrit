@@ -1,4 +1,4 @@
-# spyrit
+# Spyrit
 An anthology of programs written in Python.
 
 # TEXT ADVENTURE
@@ -13,3 +13,28 @@ In the beginning God created the heavens, the earth. Now the earth was formless 
 And we arrive back to the present. Lucifer has been ruling over the heavens for years now and has been doing suprisingly well; and as for God, lets just say some of his more "wilder" fantasies got fufilled. 
 
 God remembers and is looking for revenge. Help him escape the depths of Hell and you just might go to the good place. 
+
+# What's comming up?
+We're having a little trouble loading this page right now. Check back soon!
+        ,                     .-' ,c'.
+         __rK                    _)a  7  ;
+        /  ~,)                  (_,      (
+      _;   /a(                   |_.    :'\
+      L/\.'__/                   \       ' )nnnK-.
+      S  / (_                  .- L,-'   .dHHHb   |
+      S( '\_\\                / dHb'----'dHHHHb    \
+      S \  ,  )      _,-._   / dHHHb"x.dHHHHHHb     \
+      S |'. '.______/_U/_ '.-z/dHHHp   'dHHHHHb\     |
+     [H |  '..___.--'._C__  ) |         dHHHHHHb\ _   \
+     /| |_  | \     L/'--._/_ ;                  k '  /
+     |//- '-. ---.__         '|                 /     |
+      (       '-.   '.        |               _'-.  _/
+  .."' `.,  _ ,  :  | \      _\             ,/ ,  '/
+."       ':   .     : |   .-' '',          : |/(/\]/
+          \  /:  '  | :  /_      '...... .'/      |
+           |     |  : / .' '--.__,     __.'\      /
+           |   : ;  |/ |         '----'L,  |     /
+            \  : .   \  '-.________ /   ]  |____/
+    snd     L_____'..'           _.7' _/  <,    >
+                                <___.'     /    \
+                                           \____/
